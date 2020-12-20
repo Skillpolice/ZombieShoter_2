@@ -21,7 +21,6 @@ public class Player : MonoBehaviour
     private void Update()
     {
         CheckFire();
-
     }
 
     private void CheckFire()

@@ -42,6 +42,7 @@ public class PlayerMovement : MonoBehaviour
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
         Vector3 direction = playerPos - mouseWorldPos;
+
         direction.z = 0;
         transform.up = direction;
 
