@@ -18,8 +18,8 @@ public class Bullet : MonoBehaviour
         rb.velocity = -transform.up * bullSpeed; //Скорость пули - стреляет куда смотрит
     }
 
-    private void Update()
+    private void OnBecameInvisible()
     {
-         
+        Destroy(gameObject);
     }
 }

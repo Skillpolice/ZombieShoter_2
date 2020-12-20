@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     Rigidbody2D rb;
+    Animator animator;
 
     [Header("Speed Player")]
     public float speed;
@@ -12,11 +13,7 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-    }
-
-    private void Start()
-    {
-        
+        animator = GetComponent<Animator>();
     }
 
     private void Update() // Движение персонажа
@@ -37,6 +34,7 @@ public class PlayerMovement : MonoBehaviour
             direction = direction.normalized;
         }
         rb.velocity = direction * speed;
+        animator.SetFloat("Walk", direction.magnitude);
     }
     public void Rotate()
     {
