@@ -29,9 +29,9 @@ public class PlayerMovement : MonoBehaviour
 
         Vector3 direction = new Vector3(inputX, inputY);
 
-        if (direction.magnitude > 1) //если длинна вектора > 1, нормалезуем дистанцию
+        if (direction.magnitude > 1) //если длинна вектора > 1, нормалезуем дистанцию 
         {
-            direction = direction.normalized;
+            direction = direction.normalized; //direction.magnitude - длина вектора
         }
         rb.velocity = direction * speed;
         animator.SetFloat("Walk", direction.magnitude);
