@@ -27,14 +27,14 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.CompareTag("Player") && collision.gameObject.CompareTag("BulletEnemy"))
+        if(collision.gameObject.CompareTag("Player") && collision.gameObject.CompareTag("BulletPlayer"))
         {
             player.HealthPlayer();
             Destroy(gameObject);
         }
-        if(collision.gameObject.CompareTag("Enemy") && collision.gameObject.CompareTag("BulletPlayer"))
+        if(collision.gameObject.CompareTag("Enemy") && collision.gameObject.CompareTag("BulletEnemy"))
         {
-            //enemy.HealthEnemy();
+            enemy.HealthEnemy();
             Destroy(gameObject);
         }
     }
