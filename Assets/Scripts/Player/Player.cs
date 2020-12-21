@@ -2,12 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
+    Enemy enemy;
     Animator animator;
     CircleCollider2D coll2D;
+    GameManager gameManager;
 
+    [Header("Text")]
     public Text playerHealthText;
 
     [Header("Bullet Obj")]
@@ -30,8 +34,10 @@ public class Player : MonoBehaviour
     }
     private void Start()
     {
-        playerHealthText.text = "Player: " + healthPlayer.ToString();
+        gameManager = FindObjectOfType<GameManager>();
+        enemy = FindObjectOfType<Enemy>();
 
+        playerHealthText.text = "Player: " + healthPlayer.ToString();
     }
 
     private void Update()
@@ -41,13 +47,20 @@ public class Player : MonoBehaviour
 
     private void CheckFire()
     {
-        if (Input.GetButtonDown("Fire1") && nextFire <= 0)
+        if (healthPlayer > 0)
         {
-            Attack();
+            if (Input.GetButtonDown("Fire1") && nextFire <= 0)
+            {
+                Attack();
+            }
+            if (nextFire > 0)
+            {
+                nextFire -= Time.deltaTime;
+            }
         }
-        if (nextFire > 0)
+        else
         {
-            nextFire -= Time.deltaTime;
+            return;
         }
     }
 
@@ -60,19 +73,21 @@ public class Player : MonoBehaviour
 
     public void HealthPlayer()
     {
-        healthPlayer -= bullDamage;
+        healthPlayer -= enemy.bullDamage;
         playerHealthText.text = "Player: " + healthPlayer.ToString();
 
         if (healthPlayer <= 50)
         {
             playerHealthText.color = Color.red;
         }
-        else if (healthPlayer <= 0)
+        if (healthPlayer <= 0)
         {
             playerHealthText.text = "Player: Dead";
             animator.SetTrigger("Death");
+            gameManager.RestartGame();
             coll2D.enabled = false;
         }
 
     }
+
 }

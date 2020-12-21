@@ -10,8 +10,6 @@ public class Bullet : MonoBehaviour
 
     public float bullSpeed;
 
-    
-
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -27,12 +25,12 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.CompareTag("Player") && collision.gameObject.CompareTag("BulletPlayer"))
+        if(collision.gameObject.CompareTag("Player"))
         {
             player.HealthPlayer();
             Destroy(gameObject);
         }
-        if(collision.gameObject.CompareTag("Enemy") && collision.gameObject.CompareTag("BulletEnemy"))
+        if(collision.gameObject.CompareTag("Enemy"))
         {
             enemy.HealthEnemy();
             Destroy(gameObject);

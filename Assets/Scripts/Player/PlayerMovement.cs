@@ -6,6 +6,7 @@ public class PlayerMovement : MonoBehaviour
 {
     Rigidbody2D rb;
     Animator animator;
+    Player player;
 
     [Header("Speed Player")]
     public float speed;
@@ -16,6 +17,11 @@ public class PlayerMovement : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
+    private void Start()
+    {
+        player = FindObjectOfType<Player>();
+    }
+
     private void Update() // Движение персонажа
     {
         Move();
@@ -24,27 +30,42 @@ public class PlayerMovement : MonoBehaviour
 
     private void Move()
     {
-        float inputX = Input.GetAxis("Horizontal");
-        float inputY = Input.GetAxis("Vertical");
-
-        Vector3 direction = new Vector3(inputX, inputY);
-
-        if (direction.magnitude > 1) //если длинна вектора > 1, нормалезуем дистанцию 
+        if (player.healthPlayer > 0)
         {
-            direction = direction.normalized; //direction.magnitude - длина вектора
+            float inputX = Input.GetAxis("Horizontal");
+            float inputY = Input.GetAxis("Vertical");
+
+            Vector3 direction = new Vector3(inputX, inputY);
+
+            if (direction.magnitude > 1) //если длинна вектора > 1, нормалезуем дистанцию 
+            {
+                direction = direction.normalized; //direction.magnitude - длина вектора
+            }
+            rb.velocity = direction * speed;
+            animator.SetFloat("Walk", direction.magnitude);
         }
-        rb.velocity = direction * speed;
-        animator.SetFloat("Walk", direction.magnitude);
+        else
+        {
+            return;
+        }
     }
+
     public void Rotate()
     {
-        Vector3 playerPos = transform.position;
-        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        if(player.healthPlayer > 0)
+        {
+            Vector3 playerPos = transform.position;
+            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector3 direction = playerPos - mouseWorldPos;
 
-        Vector3 direction = playerPos - mouseWorldPos;
-
-        direction.z = 0;
-        transform.up = direction;
+            direction.z = 0;
+            transform.up = direction;
+        }
+        else
+        {
+            return;
+        }
+       
 
     }
 }

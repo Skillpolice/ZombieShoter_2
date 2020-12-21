@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class Enemy : MonoBehaviour
 {
-    Bullet bullet;
+    Player player;
     Animator animator;
     CircleCollider2D coll2D;
 
@@ -22,12 +22,13 @@ public class Enemy : MonoBehaviour
 
     private void Awake()
     {
-        animator = FindObjectOfType<Animator>();
-        coll2D = FindObjectOfType<CircleCollider2D>();
+        animator = GetComponent<Animator>();
+        coll2D = GetComponent<CircleCollider2D>();
     }
 
     private void Start()
     {
+        player = FindObjectOfType<Player>();
         enemyHealthText.text = "Enemy: " + healthEnemy.ToString();
 
         StartCoroutine(EnemyFire(fireRotate));
@@ -40,21 +41,24 @@ public class Enemy : MonoBehaviour
             Instantiate(bulletPrefab, shootPos.transform.position, transform.rotation);
             animator.SetTrigger("Attack");
         }
+        HealthEnemy();
     }
 
     public void HealthEnemy()
     {
-        healthEnemy -= bullDamage;
+        healthEnemy -= player.bullDamage;
         enemyHealthText.text = "Enemy: " + healthEnemy.ToString();
-        if(healthEnemy <= 50)
+        if (healthEnemy <= 50)
         {
             enemyHealthText.color = Color.red;
         }
-        else if (healthEnemy <= 0)
+        if (healthEnemy <= 0)
         {
             enemyHealthText.text = "Enemy: Dead";
             animator.SetTrigger("Death");
             coll2D.enabled = false;
+            StopAllCoroutines();
+            return;
         }
 
     }

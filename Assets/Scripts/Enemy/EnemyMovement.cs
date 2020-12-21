@@ -5,10 +5,12 @@ using UnityEngine;
 public class EnemyMovement : MonoBehaviour
 {
     PlayerMovement playerMovement;
+    Enemy enemy;
 
     private void Start()
     {
         playerMovement = FindObjectOfType<PlayerMovement>();
+        enemy = FindObjectOfType<Enemy>();
     }
     private void Update()
     {
@@ -17,12 +19,19 @@ public class EnemyMovement : MonoBehaviour
 
     public void EnemyRotate()
     {
-        Vector3 enemyPos = transform.position;
-        Vector3 playerPos = playerMovement.transform.position;
-        Vector3 direction = enemyPos - playerPos;
+        if (enemy.healthEnemy > 0)
+        {
+            Vector3 enemyPos = transform.position;
+            Vector3 playerPos = playerMovement.transform.position;
+            Vector3 direction = enemyPos - playerPos;
 
-        direction.z = 0;
-        transform.up = direction;
+            direction.z = 0;
+            transform.up = direction;
+        }
+        else
+        {
+            return;
+        }
 
     }
 }
