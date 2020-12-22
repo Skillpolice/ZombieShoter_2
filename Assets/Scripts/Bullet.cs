@@ -7,6 +7,7 @@ public class Bullet : MonoBehaviour
     Rigidbody2D rb;
     Player player;
     Enemy enemy;
+    Zombie zombie;
 
     public float bullSpeed;
 
@@ -19,20 +20,26 @@ public class Bullet : MonoBehaviour
     {
         player = FindObjectOfType<Player>();
         enemy = FindObjectOfType<Enemy>();
+        zombie = FindObjectOfType<Zombie>();
 
         rb.velocity = -transform.up * bullSpeed; //Скорость пули - стреляет куда смотрит
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.CompareTag("Player"))
+        if (collision.gameObject.CompareTag("Player"))
         {
             player.HealthPlayer();
             Destroy(gameObject);
         }
-        if(collision.gameObject.CompareTag("Enemy"))
+        if (collision.gameObject.CompareTag("Enemy"))
         {
             enemy.HealthEnemy();
+            Destroy(gameObject);
+        }
+        if (collision.gameObject.CompareTag("Zombie"))
+        {
+            //zombie.HealthZombie();
             Destroy(gameObject);
         }
     }
