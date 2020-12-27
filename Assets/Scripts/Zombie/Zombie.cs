@@ -19,7 +19,9 @@ public class Zombie : MonoBehaviour
 
     [Header("Zombie")]
     public int healthZombie = 100;
+    public float hitRotate;
     public int bullDamage;
+    float hitNexAttack;
 
 
     bool isDead = false;
@@ -54,7 +56,7 @@ public class Zombie : MonoBehaviour
     public void HealthZombie()
     {
         healthZombie -= player.bullDamage;
-        textHealthZombie.text = "Enemy: " + healthZombie.ToString();
+        textHealthZombie.text = "Zombie: " + healthZombie.ToString();
         if (healthZombie <= 50)
         {
             textHealthZombie.color = Color.red;
@@ -68,32 +70,31 @@ public class Zombie : MonoBehaviour
         }
     }
 
-    //public void UpdateHealth(int amount) 
-    //{
-    //    healthZombie += amount;
-    //    if(healthZombie <= 0)
-    //    {
-    //        isDead = true;
-    //        animator.SetTrigger("Death");
-    //    }
-    //}
 
     public void DistanceZombie()
     {
         dictanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
 
-        switch (activeState)
+        if (healthZombie > 0)
         {
-            case ZombieState.STAND:
-                DoStand();
-                break;
-            case ZombieState.MOVE:
-                DoMove();
-                break;
-            case ZombieState.ATTACK:
-                DoAttack();
-                break;
+            switch (activeState)
+            {
+                case ZombieState.STAND:
+                    DoStand();
+                    break;
+                case ZombieState.MOVE:
+                    DoMove();
+                    break;
+                case ZombieState.ATTACK:
+                    DoAttack();
+                    break;
+            }
         }
+        else if (player.healthPlayer <= 0)
+        {
+            return;
+        }
+
     }
 
     public void DoStand()
@@ -101,12 +102,6 @@ public class Zombie : MonoBehaviour
         if (dictanceToPlayer < moveRadius)
         {
             activeState = ZombieState.MOVE;
-            return;
-        }
-        if (dictanceToPlayer > saveZone)
-        {
-            activeState = ZombieState.MOVE;
-           // movement.SavePositionZombie();
             return;
         }
         movement.enabled = false;
@@ -118,7 +113,7 @@ public class Zombie : MonoBehaviour
             activeState = ZombieState.ATTACK;
             return;
         }
-        else if (moveRadius < dictanceToPlayer)
+        if (dictanceToPlayer > saveZone)
         {
             activeState = ZombieState.STAND;
             return;
@@ -132,10 +127,34 @@ public class Zombie : MonoBehaviour
             activeState = ZombieState.MOVE;
             return;
         }
-
         movement.enabled = false;
-        animator.SetTrigger("Attack");
+
+        hitNexAttack -= Time.deltaTime;
+        if (hitNexAttack < 0)
+        {
+            animator.SetTrigger("Attack");
+            hitNexAttack = hitRotate;
+        }
     }
+
+    public void DamageToPlayer()
+    {
+        if(dictanceToPlayer > attackRadius)
+        {
+            return;
+        }
+        player.HealthPlayer(bullDamage);
+    }
+
+    //IEnumerator AttackCoroutine()
+    //{
+    //    while (true)
+    //    {
+    //        player.HealthPlayer(bullDamage);
+    //        animator.SetTrigger("Attack");
+    //        yield return new WaitForSeconds(hitRotate);
+    //    }
+    //}
 
     private void OnDrawGizmos()
     {

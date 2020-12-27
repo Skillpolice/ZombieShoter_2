@@ -24,48 +24,39 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update() // Движение персонажа
     {
-        Move();
-        Rotate();
+        if (player.healthPlayer > 0)
+        {
+            Move();
+            Rotate();
+        }
+        else
+        {
+            return;
+        }
     }
 
     private void Move()
     {
-        if (player.healthPlayer > 0)
-        {
-            float inputX = Input.GetAxis("Horizontal");
-            float inputY = Input.GetAxis("Vertical");
+        float inputX = Input.GetAxis("Horizontal");
+        float inputY = Input.GetAxis("Vertical");
 
-            Vector3 direction = new Vector3(inputX, inputY);
+        Vector3 direction = new Vector3(inputX, inputY);
 
-            if (direction.magnitude > 1) //если длинна вектора > 1, нормалезуем дистанцию 
-            {
-                direction = direction.normalized; //direction.magnitude - длина вектора
-            }
-            rb.velocity = direction * speed;
-            animator.SetFloat("Walk", direction.magnitude);
-        }
-        else
+        if (direction.magnitude > 1) //если длинна вектора > 1, нормалезуем дистанцию 
         {
-            return;
+            direction = direction.normalized; //direction.magnitude - длина вектора
         }
+        rb.velocity = direction * speed;
+        animator.SetFloat("Walk", direction.magnitude);
     }
 
     public void Rotate()
     {
-        if(player.healthPlayer > 0)
-        {
-            Vector3 playerPos = transform.position;
-            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3 direction = playerPos - mouseWorldPos;
+        Vector3 playerPos = transform.position;
+        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 direction = playerPos - mouseWorldPos;
 
-            direction.z = 0;
-            transform.up = direction;
-        }
-        else
-        {
-            return;
-        }
-       
-
+        direction.z = 0;
+        transform.up = direction;
     }
 }

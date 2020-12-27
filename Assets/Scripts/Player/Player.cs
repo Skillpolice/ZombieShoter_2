@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
+    Zombie zombie;
     Enemy enemy;
     Animator animator;
     CircleCollider2D coll2D;
@@ -36,6 +37,7 @@ public class Player : MonoBehaviour
     {
         gameManager = FindObjectOfType<GameManager>();
         enemy = FindObjectOfType<Enemy>();
+        zombie = FindObjectOfType<Zombie>();
 
         playerHealthText.text = "Player: " + healthPlayer.ToString();
     }
@@ -71,9 +73,10 @@ public class Player : MonoBehaviour
         animator.SetTrigger("Attack");
     }
 
-    public void HealthPlayer()
+    public void HealthPlayer(int amount)
     {
-        healthPlayer -= enemy.bullDamage;
+        healthPlayer -= amount;
+
         playerHealthText.text = "Player: " + healthPlayer.ToString();
 
         if (healthPlayer <= 50)
