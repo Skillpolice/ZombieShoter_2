@@ -24,14 +24,16 @@ public class Zombie : MonoBehaviour
     float hitNexAttack;
 
 
-    bool isDead = false;
+    Vector3 startPosZombie;
+    //bool isDead = false;
     float dictanceToPlayer;
 
     ZombieState activeState;
     enum ZombieState
     {
         STAND,
-        MOVE,
+        RETURN,
+        MOVE_TO_PLAYER,
         ATTACK
     }
     private void Awake()
@@ -45,6 +47,9 @@ public class Zombie : MonoBehaviour
         movement = FindObjectOfType<ZombieMovement>();
 
         textHealthZombie.text = "Zombie: " + healthZombie.ToString();
+
+        startPosZombie = transform.position;
+
         activeState = ZombieState.STAND;
     }
 
@@ -53,7 +58,7 @@ public class Zombie : MonoBehaviour
         DistanceZombie();
     }
 
-    public void HealthZombie()
+    public void UpdateHealth()
     {
         healthZombie -= player.bullDamage;
         textHealthZombie.text = "Zombie: " + healthZombie.ToString();
@@ -82,11 +87,14 @@ public class Zombie : MonoBehaviour
                 case ZombieState.STAND:
                     DoStand();
                     break;
-                case ZombieState.MOVE:
+                case ZombieState.MOVE_TO_PLAYER:
                     DoMove();
                     break;
                 case ZombieState.ATTACK:
                     DoAttack();
+                    break;
+                case ZombieState.RETURN:
+                    DoReturn();
                     break;
             }
         }
@@ -94,17 +102,39 @@ public class Zombie : MonoBehaviour
         {
             return;
         }
-
     }
+    //private void ChangeState(ZombieState newState)
+    //{
+
+    //}
 
     public void DoStand()
     {
         if (dictanceToPlayer < moveRadius)
         {
-            activeState = ZombieState.MOVE;
+            activeState = ZombieState.MOVE_TO_PLAYER;
             return;
         }
         movement.enabled = false;
+    }
+
+    private void DoReturn()
+    {
+        if (dictanceToPlayer < moveRadius)
+        {
+            activeState = ZombieState.MOVE_TO_PLAYER;
+            return;
+        }
+
+        float distanseToStart = Vector3.Distance(transform.position, startPosZombie);
+        if (distanseToStart <= 0.1f)
+        {
+            activeState = ZombieState.STAND;
+            return;
+        }
+        
+        movement.targetPos = startPosZombie;
+        movement.enabled = true;
     }
     public void DoMove()
     {
@@ -115,16 +145,17 @@ public class Zombie : MonoBehaviour
         }
         if (dictanceToPlayer > saveZone)
         {
-            activeState = ZombieState.STAND;
+            activeState = ZombieState.RETURN;
             return;
         }
+        movement.targetPos = player.transform.position;
         movement.enabled = true;
     }
     public void DoAttack()
     {
         if (dictanceToPlayer > attackRadius)
         {
-            activeState = ZombieState.MOVE;
+            activeState = ZombieState.MOVE_TO_PLAYER;
             return;
         }
         movement.enabled = false;
@@ -139,11 +170,11 @@ public class Zombie : MonoBehaviour
 
     public void DamageToPlayer()
     {
-        if(dictanceToPlayer > attackRadius)
+        if (dictanceToPlayer > attackRadius)
         {
             return;
         }
-        player.HealthPlayer(bullDamage);
+        player.UpdateHealth(bullDamage);
     }
 
     //IEnumerator AttackCoroutine()

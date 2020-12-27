@@ -39,7 +39,7 @@ public class Bullet : MonoBehaviour
         //}
         if (collision.gameObject.CompareTag("Zombie"))
         {
-            zombie.HealthZombie();
+            zombie.UpdateHealth();
             Destroy(gameObject);
         }
     }

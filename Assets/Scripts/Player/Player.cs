@@ -73,7 +73,7 @@ public class Player : MonoBehaviour
         animator.SetTrigger("Attack");
     }
 
-    public void HealthPlayer(int amount)
+    public void UpdateHealth(int amount)
     {
         healthPlayer -= amount;
 

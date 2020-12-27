@@ -11,6 +11,8 @@ public class ZombieMovement : MonoBehaviour
 
     public float speedZombie = 10;
 
+    public Vector3 targetPos;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -18,8 +20,7 @@ public class ZombieMovement : MonoBehaviour
     }
     private void Start()
     {
-        player = FindObjectOfType<Player>();
-        zombie = FindObjectOfType<Zombie>();
+        zombie = FindObjectOfType<Zombie>(); 
     }
     private void Update()
     {
@@ -37,8 +38,7 @@ public class ZombieMovement : MonoBehaviour
     public void Move()
     {
         Vector3 zombiePos = transform.position;
-        Vector3 playerPos = player.transform.position;
-        Vector3 direction = playerPos - zombiePos;
+        Vector3 direction = targetPos - zombiePos;
 
         if (direction.magnitude > 1)
         {
@@ -52,8 +52,7 @@ public class ZombieMovement : MonoBehaviour
     public void Rotate()
     {
         Vector3 zombiePos = transform.position;
-        Vector3 playerPos = player.transform.position;
-        Vector3 direction = playerPos - zombiePos;
+        Vector3 direction = targetPos - zombiePos;
 
         direction.z = 0;
         transform.up = -direction;
