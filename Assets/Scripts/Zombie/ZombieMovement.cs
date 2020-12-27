@@ -7,6 +7,7 @@ public class ZombieMovement : MonoBehaviour
     Rigidbody2D rb;
     Animator animator;
     Player player;
+    Zombie zombie;
 
     public float speedZombie = 10;
 
@@ -18,11 +19,19 @@ public class ZombieMovement : MonoBehaviour
     private void Start()
     {
         player = FindObjectOfType<Player>();
+        zombie = FindObjectOfType<Zombie>();
     }
     private void Update()
     {
-        //Move();
-        Rotate();
+        if(zombie.healthZombie > 0)
+        {
+            Move();
+            Rotate();
+        }
+        else
+        {
+            return;
+        }
     }
 
     public void Move()
@@ -48,6 +57,10 @@ public class ZombieMovement : MonoBehaviour
 
         direction.z = 0;
         transform.up = -direction;
+    }
+    public void OnDisable() //Вызывается когда включается обьект
+    {
+        rb.velocity = Vector2.zero;
     }
 
 
