@@ -20,11 +20,11 @@ public class ZombieMovement : MonoBehaviour
     }
     private void Start()
     {
-        zombie = FindObjectOfType<Zombie>(); 
+        zombie = FindObjectOfType<Zombie>();
     }
     private void Update()
     {
-        if(zombie.healthZombie > 0)
+        if (zombie.healthZombie > 0)
         {
             Move();
             Rotate();

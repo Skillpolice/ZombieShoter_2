@@ -22,7 +22,6 @@ public class BombBurrel : MonoBehaviour
     {
         //TODO check tag Bullet
 
-
         Explode();
     }
 
@@ -31,9 +30,7 @@ public class BombBurrel : MonoBehaviour
         animator.SetTrigger("Explosion");
         Destroy(gameObject, 0.5f);
 
-
         Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, radiusBobmb, DamageLayers);
-
         foreach (Collider2D coll in colliders)
         {
             coll.gameObject.SendMessage("UpdateHealth", bombDmg);

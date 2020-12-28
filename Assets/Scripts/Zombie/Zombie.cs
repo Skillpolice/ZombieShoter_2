@@ -28,7 +28,7 @@ public class Zombie : MonoBehaviour
     float dictanceToPlayer;
 
     ZombieState activeState;
-    enum ZombieState
+    enum ZombieState //проверка состояний зомби
     {
         STAND,
         RETURN,
@@ -47,9 +47,9 @@ public class Zombie : MonoBehaviour
 
         textHealthZombie.text = "Zombie: " + healthZombie.ToString();
 
-        startPosZombie = transform.position;
+        startPosZombie = transform.position; //запоменаем стартовую позицию зомби
 
-        activeState = ZombieState.STAND;
+        ChangeState(ZombieState.STAND); //Делаем активный стейт
     }
 
     private void Update()
@@ -104,63 +104,76 @@ public class Zombie : MonoBehaviour
             return;
         }
     }
-    //private void ChangeState(ZombieState newState)
-    //{
 
-    //}
+    private void ChangeState(ZombieState newState)
+    {
+        switch (newState)
+        {
+            case ZombieState.STAND:
+                movement.enabled = false;
+                break;
+
+            case ZombieState.MOVE_TO_PLAYER:
+                movement.enabled = true;
+                break;
+
+            case ZombieState.ATTACK:
+                movement.enabled = false;
+                break;
+
+            case ZombieState.RETURN:
+                movement.targetPos = startPosZombie;
+                movement.enabled = true;
+                break;
+        }
+        activeState = newState;
+    }
 
     private void DoStand()
     {
         if (dictanceToPlayer < moveRadius)
         {
-            activeState = ZombieState.MOVE_TO_PLAYER;
-            return;
+            ChangeState(ZombieState.MOVE_TO_PLAYER);
         }
-        movement.enabled = false;
     }
 
     private void DoReturn()
     {
         if (dictanceToPlayer < moveRadius)
         {
-            activeState = ZombieState.MOVE_TO_PLAYER;
+            ChangeState(ZombieState.MOVE_TO_PLAYER);
             return;
         }
 
         float distanseToStart = Vector3.Distance(transform.position, startPosZombie);
         if (distanseToStart <= 0.1f)
         {
-            activeState = ZombieState.STAND;
+            ChangeState(ZombieState.MOVE_TO_PLAYER);
             return;
         }
-
-        movement.targetPos = startPosZombie;
-        movement.enabled = true;
     }
 
     private void DoMove()
     {
         if (dictanceToPlayer < attackRadius)
         {
-            activeState = ZombieState.ATTACK;
+            ChangeState(ZombieState.ATTACK);
             return;
         }
         if (dictanceToPlayer > saveZone)
         {
-            activeState = ZombieState.RETURN;
+            ChangeState(ZombieState.RETURN);
             return;
         }
         movement.targetPos = player.transform.position;
-        movement.enabled = true;
     }
     private void DoAttack()
     {
         if (dictanceToPlayer > attackRadius)
         {
-            activeState = ZombieState.MOVE_TO_PLAYER;
+            ChangeState(ZombieState.MOVE_TO_PLAYER);
             return;
         }
-        movement.enabled = false;
 
         hitNexAttack -= Time.deltaTime;
         if (hitNexAttack < 0)
