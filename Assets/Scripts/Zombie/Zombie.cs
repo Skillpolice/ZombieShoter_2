@@ -20,7 +20,7 @@ public class Zombie : MonoBehaviour
     [Header("Zombie")]
     public int healthZombie = 100;
     public float hitRotate;
-    public int bullDamage;
+    public int bullDamageZombie;
     float hitNexAttack;
 
 
@@ -189,7 +189,7 @@ public class Zombie : MonoBehaviour
         {
             return;
         }
-        player.UpdateHealth(bullDamage);
+        player.UpdateHealth(bullDamageZombie);
     }
 
     //IEnumerator AttackCoroutine()

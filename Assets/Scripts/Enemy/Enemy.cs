@@ -46,7 +46,7 @@ public class Enemy : MonoBehaviour
 
     public void UpdateHealth()
     {
-        healthEnemy -= player.bullDamage;
+        healthEnemy -= player.bullDamagePlayer;
         enemyHealthText.text = "Enemy: " + healthEnemy.ToString();
         if (healthEnemy <= 50)
         {

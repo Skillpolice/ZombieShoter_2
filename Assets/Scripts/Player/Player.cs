@@ -21,7 +21,7 @@ public class Player : MonoBehaviour
 
     [Header("Bullet")]
     public float fireRotate; //частота стрельбы
-    public int bullDamage;
+    public int bullDamagePlayer;
 
     [Header("Player")]
     public int healthPlayer;
@@ -72,6 +72,7 @@ public class Player : MonoBehaviour
         nextFire = fireRotate;
         animator.SetTrigger("Attack");
     }
+
 
     public void UpdateHealth(int amount)
     {
