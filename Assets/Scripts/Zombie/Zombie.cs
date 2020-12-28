@@ -116,25 +116,39 @@ public class Zombie : MonoBehaviour
             return;
         }
         movement.enabled = false;
+
+        print("Move 0");
     }
 
     private void DoReturn()
     {
-        if (dictanceToPlayer < moveRadius)
+        if(healthZombie > 0)
         {
-            activeState = ZombieState.MOVE_TO_PLAYER;
-            return;
-        }
+            if (dictanceToPlayer < moveRadius)
+            {
+                activeState = ZombieState.MOVE_TO_PLAYER;
+                return;
+            }
 
-        float distanseToStart = Vector3.Distance(transform.position, startPosZombie);
-        if (distanseToStart <= 0.1f)
+            float distanseToStart = Vector3.Distance(transform.position, startPosZombie);
+            if (distanseToStart <= 0.1f)
+            {
+                activeState = ZombieState.STAND;
+                return;
+            }
+
+            movement.targetPos = startPosZombie;
+            movement.enabled = true;
+
+            print("Move 1");
+        }
+        else
         {
-            activeState = ZombieState.STAND;
-            return;
+            print("Move -1");
+            movement.OnDisable();
+            movement.enabled = false;
         }
         
-        movement.targetPos = startPosZombie;
-        movement.enabled = true;
     }
     public void DoMove()
     {

@@ -10,6 +10,7 @@ public class Bullet : MonoBehaviour
     Zombie zombie;
 
     public float bullSpeed;
+    int bullDamage;
 
     private void Awake()
     {
@@ -24,19 +25,22 @@ public class Bullet : MonoBehaviour
 
         rb.velocity = -transform.up * bullSpeed; //Скорость пули - стреляет куда смотрит
     }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            player.UpdateHealth(bullDamage);
+            Destroy(gameObject);
+        }
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        //if (collision.gameObject.CompareTag("Player"))
-        //{
-        //    player.HealthPlayer();
-        //    Destroy(gameObject);
-        //}
-        //if (collision.gameObject.CompareTag("Enemy"))
-        //{
-        //    enemy.HealthEnemy();
-        //    Destroy(gameObject);
-        //}
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            enemy.UpdateHealth();
+            Destroy(gameObject);
+        }
         if (collision.gameObject.CompareTag("Zombie"))
         {
             zombie.UpdateHealth();

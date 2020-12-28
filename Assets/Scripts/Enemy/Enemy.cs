@@ -41,10 +41,10 @@ public class Enemy : MonoBehaviour
             Instantiate(bulletPrefab, shootPos.transform.position, transform.rotation);
             animator.SetTrigger("Attack");
         }
-        HealthEnemy();
+        UpdateHealth();
     }
 
-    public void HealthEnemy()
+    public void UpdateHealth()
     {
         healthEnemy -= player.bullDamage;
         enemyHealthText.text = "Enemy: " + healthEnemy.ToString();
