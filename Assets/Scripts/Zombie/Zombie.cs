@@ -25,7 +25,6 @@ public class Zombie : MonoBehaviour
 
 
     Vector3 startPosZombie;
-    //bool isDead = false;
     float dictanceToPlayer;
 
     ZombieState activeState;
@@ -58,9 +57,9 @@ public class Zombie : MonoBehaviour
         DistanceZombie();
     }
 
-    public void UpdateHealth()
+    public void UpdateHealth(int amount)
     {
-        healthZombie -= player.bullDamage;
+        healthZombie -= amount;
         textHealthZombie.text = "Zombie: " + healthZombie.ToString();
         if (healthZombie <= 50)
         {
@@ -98,8 +97,10 @@ public class Zombie : MonoBehaviour
                     break;
             }
         }
-        else if (player.healthPlayer <= 0)
+        else
         {
+            movement.OnDisable();
+            movement.enabled = false;
             return;
         }
     }
@@ -108,7 +109,7 @@ public class Zombie : MonoBehaviour
 
     //}
 
-    public void DoStand()
+    private void DoStand()
     {
         if (dictanceToPlayer < moveRadius)
         {
@@ -116,41 +117,28 @@ public class Zombie : MonoBehaviour
             return;
         }
         movement.enabled = false;
-
-        print("Move 0");
     }
 
     private void DoReturn()
     {
-        if(healthZombie > 0)
+        if (dictanceToPlayer < moveRadius)
         {
-            if (dictanceToPlayer < moveRadius)
-            {
-                activeState = ZombieState.MOVE_TO_PLAYER;
-                return;
-            }
-
-            float distanseToStart = Vector3.Distance(transform.position, startPosZombie);
-            if (distanseToStart <= 0.1f)
-            {
-                activeState = ZombieState.STAND;
-                return;
-            }
-
-            movement.targetPos = startPosZombie;
-            movement.enabled = true;
-
-            print("Move 1");
+            activeState = ZombieState.MOVE_TO_PLAYER;
+            return;
         }
-        else
+
+        float distanseToStart = Vector3.Distance(transform.position, startPosZombie);
+        if (distanseToStart <= 0.1f)
         {
-            print("Move -1");
-            movement.OnDisable();
-            movement.enabled = false;
+            activeState = ZombieState.STAND;
+            return;
         }
-        
+
+        movement.targetPos = startPosZombie;
+        movement.enabled = true;
     }
-    public void DoMove()
+
+    private void DoMove()
     {
         if (dictanceToPlayer < attackRadius)
         {
@@ -165,7 +153,7 @@ public class Zombie : MonoBehaviour
         movement.targetPos = player.transform.position;
         movement.enabled = true;
     }
-    public void DoAttack()
+    private void DoAttack()
     {
         if (dictanceToPlayer > attackRadius)
         {
@@ -182,7 +170,7 @@ public class Zombie : MonoBehaviour
         }
     }
 
-    public void DamageToPlayer()
+    private void DamageToPlayer()
     {
         if (dictanceToPlayer > attackRadius)
         {
