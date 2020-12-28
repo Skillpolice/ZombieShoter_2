@@ -30,6 +30,10 @@ public class ZombieMovement : MonoBehaviour
             Move();
             Rotate();
         }
+        else
+        {
+            return;
+        }
        
     }
 

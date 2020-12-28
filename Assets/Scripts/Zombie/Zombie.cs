@@ -10,8 +10,6 @@ public class Zombie : MonoBehaviour
     ZombieMovement movement;
     CircleCollider2D coll2D;
 
-    public Text textHealthZombie;
-
     [Header("Zones")]
     public float attackRadius = 4f;
     public float moveRadius = 10f;
@@ -45,8 +43,6 @@ public class Zombie : MonoBehaviour
     {
         player = FindObjectOfType<Player>();
 
-        textHealthZombie.text = "Zombie: " + healthZombie.ToString();
-
         startPosZombie = transform.position; //запоменаем стартовую позицию зомби
 
         ChangeState(ZombieState.STAND); //Делаем активный стейт
@@ -56,18 +52,20 @@ public class Zombie : MonoBehaviour
     {
         DistanceZombie();
     }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("BulletPlayer"))
+        {
+            UpdateHealth(player.bullDamagePlayer);
+        }
+    }
 
     public void UpdateHealth(int amount)
     {
         healthZombie -= amount;
-        textHealthZombie.text = "Zombie: " + healthZombie.ToString();
-        if (healthZombie <= 50)
-        {
-            textHealthZombie.color = Color.red;
-        }
+    
         if (healthZombie <= 0)
         {
-            textHealthZombie.text = "Zombie: Dead";
             animator.SetTrigger("Death");
             coll2D.enabled = false;
             return;
@@ -192,15 +190,6 @@ public class Zombie : MonoBehaviour
         player.UpdateHealth(bullDamageZombie);
     }
 
-    //IEnumerator AttackCoroutine()
-    //{
-    //    while (true)
-    //    {
-    //        player.HealthPlayer(bullDamage);
-    //        animator.SetTrigger("Attack");
-    //        yield return new WaitForSeconds(hitRotate);
-    //    }
-    //}
 
     private void OnDrawGizmos()
     {

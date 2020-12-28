@@ -15,9 +15,9 @@ GameObject:
   - component: {fileID: 1068547747646552029}
   - component: {fileID: 1068547747646552024}
   - component: {fileID: 1068547747646552025}
-  m_Layer: 7
+  m_Layer: 9
   m_Name: Zomb_1
-  m_TagString: Zombie
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -113,7 +113,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a43352f77f4fa2d438699e78678587bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textHealthZombie: {fileID: 0}
   attackRadius: 4
   moveRadius: 10
   saveZone: 17
