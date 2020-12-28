@@ -13,14 +13,15 @@ public class ZombieMovement : MonoBehaviour
 
     public Vector3 targetPos;
 
-    private void Awake()
+    void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        zombie = GetComponent<Zombie>();
     }
-    private void Start()
+    void Start()
     {
-        zombie = FindObjectOfType<Zombie>();
+        player = FindObjectOfType<Player>();
     }
     private void Update()
     {
@@ -29,10 +30,7 @@ public class ZombieMovement : MonoBehaviour
             Move();
             Rotate();
         }
-        else
-        {
-            return;
-        }
+       
     }
 
     public void Move()
@@ -60,6 +58,7 @@ public class ZombieMovement : MonoBehaviour
     public void OnDisable() //Вызывается когда включается обьект
     {
         rb.velocity = Vector2.zero;
+        animator.SetFloat("Walk", 0);
     }
 
 

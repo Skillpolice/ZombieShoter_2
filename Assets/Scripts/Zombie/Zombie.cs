@@ -35,15 +35,15 @@ public class Zombie : MonoBehaviour
         MOVE_TO_PLAYER,
         ATTACK
     }
-    private void Awake()
+    void Awake()
     {
         animator = GetComponent<Animator>();
         coll2D = GetComponent<CircleCollider2D>();
+        movement = GetComponent<ZombieMovement>();
     }
-    private void Start()
+    void Start()
     {
         player = FindObjectOfType<Player>();
-        movement = FindObjectOfType<ZombieMovement>();
 
         textHealthZombie.text = "Zombie: " + healthZombie.ToString();
 

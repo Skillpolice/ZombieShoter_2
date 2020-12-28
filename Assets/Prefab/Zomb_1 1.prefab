@@ -114,12 +114,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textHealthZombie: {fileID: 0}
-  attackRadius: 4
-  moveRadius: 10
-  saveZone: 17
+  attackRadius: 2.23
+  moveRadius: 6.6
+  saveZone: 13.01
   healthZombie: 100
   hitRotate: 1
-  bullDamageZombie: 0
+  bullDamageZombie: 11
 --- !u!95 &1068547747646552029
 Animator:
   serializedVersion: 3
