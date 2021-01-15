@@ -1,7 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Zombie : MonoBehaviour
 {
@@ -10,12 +10,16 @@ public class Zombie : MonoBehaviour
     ZombieMovement movement;
     CircleCollider2D coll2D;
 
-    [Header("Zones")]
+    public Action HealthChange = delegate { }; //delegate {} - пустое действие ,что бы не было ошибки в случае, если никто не подпишеться
+
+    [Header("Zones UI")]
     public float attackRadius = 4f;
     public float moveRadius = 10f;
     public float saveZone = 17f;
+    public int viewAngle = 90;
 
     [Header("Zombie")]
+    public GameObject pickaupPrefab;
     public int healthZombie = 100;
     public float hitRotate;
     public int bullDamageZombie;
@@ -23,7 +27,7 @@ public class Zombie : MonoBehaviour
 
 
     Vector3 startPosZombie;
-    float dictanceToPlayer;
+    float distanceToPlayer;
 
     ZombieState activeState;
     enum ZombieState //проверка состояний зомби
@@ -39,13 +43,16 @@ public class Zombie : MonoBehaviour
         coll2D = GetComponent<CircleCollider2D>();
         movement = GetComponent<ZombieMovement>();
     }
+
+
     void Start()
     {
         player = FindObjectOfType<Player>();
 
         startPosZombie = transform.position; //запоменаем стартовую позицию зомби
-
         ChangeState(ZombieState.STAND); //Делаем активный стейт
+
+        player.OnDeath += PlayerIsDied;
     }
 
     private void Update()
@@ -57,26 +64,13 @@ public class Zombie : MonoBehaviour
         if (collision.gameObject.CompareTag("BulletPlayer"))
         {
             UpdateHealth(player.bullDamagePlayer);
+            ChangeState(ZombieState.MOVE_TO_PLAYER);
         }
     }
-
-    public void UpdateHealth(int amount)
-    {
-        healthZombie -= amount;
-    
-        if (healthZombie <= 0)
-        {
-            animator.SetTrigger("Death");
-            coll2D.enabled = false;
-            return;
-        }
-    }
-
 
     public void DistanceZombie()
     {
-        dictanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
-
+        distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
         if (healthZombie > 0)
         {
             switch (activeState)
@@ -129,36 +123,67 @@ public class Zombie : MonoBehaviour
 
     private void DoStand()
     {
-        if (dictanceToPlayer < moveRadius)
+        if (player.healthPlayer > 0)
         {
-            ChangeState(ZombieState.MOVE_TO_PLAYER);
+            CheckMoveToPlayer();
         }
     }
 
     private void DoReturn()
     {
-        if (dictanceToPlayer < moveRadius)
+        if (player.healthPlayer > 0 && CheckMoveToPlayer())
         {
-            ChangeState(ZombieState.MOVE_TO_PLAYER);
             return;
         }
 
         float distanseToStart = Vector3.Distance(transform.position, startPosZombie);
         if (distanseToStart <= 0.1f)
         {
-            ChangeState(ZombieState.MOVE_TO_PLAYER);
+            ChangeState(ZombieState.STAND);
             return;
         }
     }
 
+    private bool CheckMoveToPlayer()
+    {
+        //проверяем радиус
+        if (distanceToPlayer > moveRadius)
+        {
+            return false;
+        }
+
+        //проверяем препядствия
+        Vector3 directionToPlayer = player.transform.position - transform.position; //получаем направление от зомби к игроку
+        Debug.DrawRay(transform.position, directionToPlayer, Color.red); //Рисует линию от точки А до точки B
+
+        float angle = Vector3.Angle(-transform.up, directionToPlayer);
+        if (angle > viewAngle / 2)
+        {
+            return false;
+        }
+
+
+        LayerMask layerMask = LayerMask.GetMask("Walls");
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, directionToPlayer, directionToPlayer.magnitude, layerMask);
+        if (hit.collider != null) //проверка на столкновение с преградой
+        {
+            //есть коллайдер
+            return false;
+        }
+
+        //бежать за игроком
+        ChangeState(ZombieState.MOVE_TO_PLAYER);
+        return true;
+    }
+
     private void DoMove()
     {
-        if (dictanceToPlayer < attackRadius)
+        if (distanceToPlayer < attackRadius)
         {
             ChangeState(ZombieState.ATTACK);
             return;
         }
-        if (dictanceToPlayer > saveZone)
+        if (distanceToPlayer > saveZone)
         {
             ChangeState(ZombieState.RETURN);
             return;
@@ -167,29 +192,52 @@ public class Zombie : MonoBehaviour
     }
     private void DoAttack()
     {
-        if (dictanceToPlayer > attackRadius)
+        if (player.healthPlayer > 0)
         {
-            ChangeState(ZombieState.MOVE_TO_PLAYER);
-            return;
-        }
+            if (distanceToPlayer > attackRadius)
+            {
+                ChangeState(ZombieState.MOVE_TO_PLAYER);
+                return;
+            }
 
-        hitNexAttack -= Time.deltaTime;
-        if (hitNexAttack < 0)
-        {
-            animator.SetTrigger("Attack");
-            hitNexAttack = hitRotate;
+            hitNexAttack -= Time.deltaTime;
+            if (hitNexAttack < 0)
+            {
+                animator.SetTrigger("Attack");
+                hitNexAttack = hitRotate;
+            }
         }
     }
 
     private void DamageToPlayer()
     {
-        if (dictanceToPlayer > attackRadius)
+        if (distanceToPlayer > attackRadius)
         {
             return;
         }
         player.UpdateHealth(bullDamageZombie);
     }
+    public void UpdateHealth(int amount)
+    {
+        healthZombie -= amount;
 
+        if (healthZombie <= 0)
+        {
+            animator.SetTrigger("Death");
+            Instantiate(pickaupPrefab, transform.position * 1.03f, Quaternion.identity);
+            coll2D.enabled = false;
+
+            player.OnDeath -= PlayerIsDied;
+
+            return;
+        }
+        HealthChange(); //высоз события
+    }
+
+    private void PlayerIsDied()
+    {
+        ChangeState(ZombieState.RETURN);
+    }
 
     private void OnDrawGizmos()
     {

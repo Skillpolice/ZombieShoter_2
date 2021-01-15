@@ -1,19 +1,23 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
-    Zombie zombie;
-    Enemy enemy;
+    //Zombie zombie;
+    //Enemy enemy;
     Animator animator;
     CircleCollider2D coll2D;
     GameManager gameManager;
 
+    public Action OnHealthChange = delegate { }; //пустой делегат ,что бы не выскакивало ошибок
+    public Action OnDeath = delegate { };
+
     [Header("Text")]
-    public Text playerHealthText;
+    //public Text playerHealthText;
+    public Text playerAmmo;
+    public Text reloadAmmo;
 
     [Header("Bullet Obj")]
     public Bullet bulletPrefab;
@@ -22,38 +26,79 @@ public class Player : MonoBehaviour
     [Header("Bullet")]
     public float fireRotate; //частота стрельбы
     public int bullDamagePlayer;
+    public int maxAmmo;
+    public int maxClips;
+    public float reloadTime;
+    [HideInInspector]
+    public int currenAmmo = -1;
+    private bool isreloding = false;
 
     [Header("Player")]
     public int healthPlayer;
 
-    float nextFire; //сколько прошло времени от предыдущего выстрела
+    float nextFire; //сколько прошло времени от предыдущего выстрела\
+
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
         coll2D = GetComponent<CircleCollider2D>();
+        gameManager = GetComponent<GameManager>();
     }
     private void Start()
     {
-        gameManager = FindObjectOfType<GameManager>();
-        enemy = FindObjectOfType<Enemy>();
-        zombie = FindObjectOfType<Zombie>();
+        //enemy = FindObjectOfType<Enemy>();
+        //zombie = FindObjectOfType<Zombie>();
 
-        playerHealthText.text = "Player: " + healthPlayer.ToString();
+        currenAmmo = maxAmmo;
+
+        //playerHealthText.text = "Player: " + healthPlayer.ToString();
+        playerAmmo.text = currenAmmo + " / " + maxClips.ToString();
     }
 
     private void Update()
     {
+        //Debug.DrawRay(transform.position, (shootPosBullet.transform.position - transform.position) * 10, Color.green);
+
+        playerAmmo.text = currenAmmo + " / " + maxClips.ToString();
         CheckFire();
     }
 
-    private void CheckFire()
+    public void CheckFire()
     {
         if (healthPlayer > 0)
         {
+            if (isreloding)
+            {
+                return;
+            }
+            if (currenAmmo <= 0)
+            {
+                reloadAmmo.enabled = true;
+                if (Input.GetKeyDown(KeyCode.R))
+                {
+                    StartCoroutine(ReloadFire());
+                }
+                return;
+            }
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                if (currenAmmo < maxAmmo)
+                {
+                    StartCoroutine(ReloadFire());
+                }
+
+            }
+            if (maxClips < 0)
+            {
+                playerAmmo.text = "0 / 0";
+                StopCoroutine(ReloadFire());
+                return;
+            }
+
             if (Input.GetButtonDown("Fire1") && nextFire <= 0)
             {
-                Attack();
+                Shoot();
             }
             if (nextFire > 0)
             {
@@ -66,30 +111,45 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void Attack()
+    IEnumerator ReloadFire()
     {
+        isreloding = true;
+        print("Reloading..");
+
+        maxClips--;
+
+        yield return new WaitForSeconds(reloadTime);
+
+        playerAmmo.text = currenAmmo + " / " + maxClips.ToString();
+
+        currenAmmo = maxAmmo;
+        reloadAmmo.enabled = false;
+        isreloding = false;
+    }
+
+    private void Shoot()
+    {
+        currenAmmo--;
+        playerAmmo.text = currenAmmo + " / " + maxClips.ToString();
+
         Instantiate(bulletPrefab, shootPosBullet.transform.position, transform.rotation); //Создание пули , префаб, откуда идем выстрел и нужное вращение
         nextFire = fireRotate;
         animator.SetTrigger("Attack");
+
     }
 
 
     public void UpdateHealth(int amount)
     {
         healthPlayer -= amount;
+        OnHealthChange();
 
-        playerHealthText.text = "Player: " + healthPlayer.ToString();
-
-        if (healthPlayer <= 50)
-        {
-            playerHealthText.color = Color.red;
-        }
         if (healthPlayer <= 0)
         {
-            playerHealthText.text = "Player: Dead";
             animator.SetTrigger("Death");
-            gameManager.RestartGame();
+            //gameManager.RestartGame();
             coll2D.enabled = false;
+            OnDeath();
         }
 
     }
